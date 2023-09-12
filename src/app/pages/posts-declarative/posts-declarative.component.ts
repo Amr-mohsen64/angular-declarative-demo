@@ -11,13 +11,12 @@ import { DeclarativePostsService } from './../../services/declarative-posts.serv
 })
 export class PostsDeclarativeComponent implements OnInit {
   selectedCategorySubject = new BehaviorSubject<string>('');
-  selectedCategoryAction = this.selectedCategorySubject.asObservable();
+  selectedCategoryAction$ = this.selectedCategorySubject.asObservable();
   categories$ = this.categoriesDeclarativeService.categories$;
   posts$ = this.declarativePostsService.postsWithCategory$;
-
   filteredPosts$ = combineLatest([
     this.posts$,
-    this.selectedCategorySubject,
+    this.selectedCategoryAction$,
   ]).pipe(
     map(([posts, selectedCategoryId]) => {
       return posts.filter((post) =>
@@ -34,7 +33,6 @@ export class PostsDeclarativeComponent implements OnInit {
   ngOnInit(): void {}
 
   onFilterCategory(event: Event) {
-    combineLatest([this.posts$]);
     const selectedCategoryId = (<HTMLSelectElement>event.target).value;
     this.selectedCategorySubject.next(selectedCategoryId);
   }

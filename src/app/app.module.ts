@@ -8,9 +8,11 @@ import { PostsComponent } from './pages/posts/posts.component';
 import { HttpClientModule } from '@angular/common/http';
 import { HomeComponent } from './components/home/home.component';
 import { PostsDeclarativeComponent } from './pages/posts-declarative/posts-declarative.component';
+import { AllPostsComponent } from './pages/all-posts/all-posts.component';
+import { SinglePostComponent } from './components/single-post/single-post.component';
 
 @NgModule({
-  declarations: [AppComponent, HeaderComponent, PostsComponent, HomeComponent, PostsDeclarativeComponent],
+  declarations: [AppComponent, HeaderComponent, PostsComponent, HomeComponent, PostsDeclarativeComponent, AllPostsComponent, SinglePostComponent],
   imports: [BrowserModule, AppRoutingModule, HttpClientModule],
   providers: [],
   bootstrap: [AppComponent],
