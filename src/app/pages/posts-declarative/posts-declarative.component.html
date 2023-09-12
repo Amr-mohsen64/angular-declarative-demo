@@ -1,0 +1,36 @@
+<div class="row">
+  <div class="col-md-12">
+    <h3>Post data</h3>
+    <div class="row">
+      <div class="col-md-4">
+        <select (change)="onFilterCategory($event)">
+          <option value="">
+            select category
+          </option>
+          <option [value]="category.id" *ngFor="let category of categories$ | async">
+            {{category.title}}
+          </option>
+        </select>
+      </div>
+    </div>
+
+    <table class="table" *ngIf="filteredPosts$ | async as posts">
+      <thead>
+        <tr>
+          <th>Id</th>
+          <th>Title</th>
+          <th>Description</th>
+          <th>Category</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let post of posts">
+          <td>{{post.id}}</td>
+          <td>{{post.title}}</td>
+          <td>{{post.description}}</td>
+          <td>{{post.categoryName}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
