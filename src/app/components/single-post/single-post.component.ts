@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { BehaviorSubject, EMPTY, catchError } from 'rxjs';
 import { DeclarativePostsService } from 'src/app/services/declarative-posts.service';
 
 @Component({
@@ -8,6 +9,15 @@ import { DeclarativePostsService } from 'src/app/services/declarative-posts.serv
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SinglePostComponent {
+  errorMessageSubject = new BehaviorSubject('');
+  errorMessageAction$ = this.errorMessageSubject.asObservable();
+
   constructor(private postsService: DeclarativePostsService) {}
-  post$ = this.postsService.post$;
+
+  post$ = this.postsService.post$.pipe(
+    catchError((err: string) => {
+      this.errorMessageSubject.next(err);
+      return EMPTY;
+    })
+  );
 }

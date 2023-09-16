@@ -1,8 +1,17 @@
-import { CategoriesDeclarativeService } from './categories-declartive.service';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import {
+  Subject,
+  catchError,
+  combineLatest,
+  delay,
+  map,
+  share,
+  shareReplay,
+  throwError,
+} from 'rxjs';
 import { IPost } from '../models/IPost.model';
-import { Subject, combineLatest, find, forkJoin, map } from 'rxjs';
+import { CategoriesDeclarativeService } from './categories-declartive.service';
 
 @Injectable({
   providedIn: 'root',
@@ -18,13 +27,16 @@ export class DeclarativePostsService {
       'https://declarative-angular-1d8a5-default-rtdb.firebaseio.com/posts.json'
     )
     .pipe(
+      delay(2000),
       map((responseObject) => {
         const postsList: IPost[] = [];
         for (const key in responseObject) {
           postsList.push({ ...responseObject[key], id: key });
         }
         return postsList;
-      })
+      }),
+      catchError(this.handleError),
+      shareReplay(1) //FOR CACHE
     );
 
   postsWithCategory$ = combineLatest([
@@ -40,7 +52,8 @@ export class DeclarativePostsService {
           )?.title,
         };
       });
-    })
+    }),
+    catchError(this.handleError)
   );
 
   private selectedPostSubject = new Subject<string>();
@@ -52,10 +65,15 @@ export class DeclarativePostsService {
   ]).pipe(
     map(([posts, selectedPostId]) =>
       posts.find((post) => post.id === selectedPostId)
-    )
+    ),
+    catchError(this.handleError)
   );
 
   selectPost(postId: string) {
     this.selectedPostSubject.next(postId);
+  }
+
+  handleError(error: Error) {
+    return throwError(() => 'unknown error ocurred, please try againg');
   }
 }

@@ -1,5 +1,6 @@
+import { LoaderService } from './../../services/loader.service';
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
-import { BehaviorSubject, combineLatest, map } from 'rxjs';
+import { BehaviorSubject, combineLatest, map, tap } from 'rxjs';
 import { CategoriesDeclarativeService } from './../../services/categories-declartive.service';
 import { DeclarativePostsService } from './../../services/declarative-posts.service';
 
@@ -14,6 +15,7 @@ export class PostsDeclarativeComponent implements OnInit {
   selectedCategoryAction$ = this.selectedCategorySubject.asObservable();
   categories$ = this.categoriesDeclarativeService.categories$;
   posts$ = this.declarativePostsService.postsWithCategory$;
+
   filteredPosts$ = combineLatest([
     this.posts$,
     this.selectedCategoryAction$,
@@ -22,15 +24,19 @@ export class PostsDeclarativeComponent implements OnInit {
       return posts.filter((post) =>
         selectedCategoryId ? post.categoryId === selectedCategoryId : true
       );
-    })
+    }),
+    tap(() => this.loaderService.hideLoader())
   );
 
   constructor(
     private declarativePostsService: DeclarativePostsService,
-    private categoriesDeclarativeService: CategoriesDeclarativeService
+    private categoriesDeclarativeService: CategoriesDeclarativeService,
+    private loaderService: LoaderService
   ) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.loaderService.showLoader();
+  }
 
   onFilterCategory(event: Event) {
     const selectedCategoryId = (<HTMLSelectElement>event.target).value;
