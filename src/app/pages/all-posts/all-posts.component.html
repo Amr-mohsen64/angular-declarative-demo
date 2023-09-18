@@ -1,4 +1,12 @@
 <div class="row">
+  <div class="col-md-12">
+    <h3>Post details</h3>
+    <div>
+      <button class="btn btn-primary" (click)="onAddPost()">add post</button>
+    </div>
+  </div>
+</div>
+<div class="row">
   <div class="col-md-4">
     <div class="list-group" *ngIf="vm$  | async as vm">
       <a (click)="onSelectPost(post)" class="list-group-item list-group-item-action "
@@ -8,6 +16,7 @@
     </div>
   </div>
   <div class="col-md-8">
-    <app-single-post></app-single-post>
+    <app-single-post *ngIf="!showAddPost"></app-single-post>
+    <app-add-post *ngIf="showAddPost"></app-add-post>
   </div>
 </div>

@@ -1,3 +1,4 @@
+import { CRUDAction } from './../models/IPost.model';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import {
@@ -6,6 +7,8 @@ import {
   combineLatest,
   delay,
   map,
+  merge,
+  scan,
   share,
   shareReplay,
   throwError,
@@ -27,7 +30,7 @@ export class DeclarativePostsService {
       'https://declarative-angular-1d8a5-default-rtdb.firebaseio.com/posts.json'
     )
     .pipe(
-      delay(2000),
+      // delay(2000),
       map((responseObject) => {
         const postsList: IPost[] = [];
         for (const key in responseObject) {
@@ -53,8 +56,23 @@ export class DeclarativePostsService {
         };
       });
     }),
-    catchError(this.handleError)
+    catchError(this.handleError),
+    shareReplay(1)
   );
+
+  private postCRUDSubject = new Subject<CRUDAction<IPost>>();
+  postCRUDAction$ = this.postCRUDSubject.asObservable();
+
+  allPosts$ = merge(
+    this.postsWithCategory$,
+    this.postCRUDAction$.pipe(map((data) => [data.data]))
+  ).pipe(
+    scan((postsWithCat, newCurdedPost) => [...postsWithCat, ...newCurdedPost])
+  );
+
+  addPost(post: IPost) {
+    this.postCRUDSubject.next({ action: 'add', data: post });
+  }
 
   private selectedPostSubject = new Subject<string>();
   selectedPostAction$ = this.selectedPostSubject.asObservable();
@@ -66,6 +84,7 @@ export class DeclarativePostsService {
     map(([posts, selectedPostId]) =>
       posts.find((post) => post.id === selectedPostId)
     ),
+    shareReplay(1),
     catchError(this.handleError)
   );
 

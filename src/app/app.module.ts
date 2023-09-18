@@ -11,10 +11,27 @@ import { PostsDeclarativeComponent } from './pages/posts-declarative/posts-decla
 import { AllPostsComponent } from './pages/all-posts/all-posts.component';
 import { SinglePostComponent } from './components/single-post/single-post.component';
 import { LoadingComponent } from './components/loading/loading.component';
+import { AddPostComponent } from './components/add-post/add-post.component';
+import { ReactiveFormsModule } from '@angular/forms';
 
 @NgModule({
-  declarations: [AppComponent, HeaderComponent, PostsComponent, HomeComponent, PostsDeclarativeComponent, AllPostsComponent, SinglePostComponent, LoadingComponent],
-  imports: [BrowserModule, AppRoutingModule, HttpClientModule],
+  declarations: [
+    AppComponent,
+    HeaderComponent,
+    PostsComponent,
+    HomeComponent,
+    PostsDeclarativeComponent,
+    AllPostsComponent,
+    SinglePostComponent,
+    LoadingComponent,
+    AddPostComponent,
+  ],
+  imports: [
+    BrowserModule,
+    AppRoutingModule,
+    HttpClientModule,
+    ReactiveFormsModule,
+  ],
   providers: [],
   bootstrap: [AppComponent],
 })

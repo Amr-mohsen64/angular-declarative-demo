@@ -10,7 +10,8 @@ import { LoaderService } from './../../services/loader.service';
   styleUrls: ['./all-posts.component.scss'],
 })
 export class AllPostsComponent implements OnInit {
-  posts$ = this.postsService.postsWithCategory$.pipe(
+  showAddPost = false;
+  posts$ = this.postsService.allPosts$.pipe(
     tap((posts) => posts[0].id && this.postsService.selectPost(posts[0].id))
   );
   selectedPost$ = this.postsService.post$.pipe(tap(() => console.log('fired'))); // performance issue called at number of items to solve this use view model
@@ -35,5 +36,9 @@ export class AllPostsComponent implements OnInit {
 
   onSelectPost(post: IPost) {
     post.id && this.postsService.selectPost(post.id);
+  }
+
+  onAddPost() {
+    this.showAddPost = true;
   }
 }
