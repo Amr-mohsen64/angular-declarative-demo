@@ -1,5 +1,10 @@
 import { LoaderService } from './../../services/loader.service';
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  Input,
+  OnInit,
+} from '@angular/core';
 import { BehaviorSubject, combineLatest, map, tap } from 'rxjs';
 import { CategoriesDeclarativeService } from './../../services/categories-declartive.service';
 import { DeclarativePostsService } from './../../services/declarative-posts.service';
@@ -11,7 +16,7 @@ import { DeclarativePostsService } from './../../services/declarative-posts.serv
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PostsDeclarativeComponent implements OnInit {
-  selectedCategorySubject = new BehaviorSubject<string>('');
+  private selectedCategorySubject = new BehaviorSubject<string>('');
   selectedCategoryAction$ = this.selectedCategorySubject.asObservable();
   categories$ = this.categoriesDeclarativeService.categories$;
   posts$ = this.declarativePostsService.postsWithCategory$;

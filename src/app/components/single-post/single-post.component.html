@@ -4,8 +4,12 @@
   </div>
 </div>
 <div *ngIf="post$ | async as post">
+  <button class="btn btn-warning" (click)="updatePost()">Update Post</button>
+  <button class="btn btn-warning" (click)="deletePost(post)">Delete Post</button>
+  <h3>Post details</h3>
   <div>ID: {{post.id}}</div>
   <div>title: {{post.title}}</div>
   <div>Description: {{post.description}}</div>
   <div>Category: {{post.categoryName}}</div>
+  <app-update-post *ngIf="showUpdatePost"></app-update-post>
 </div>

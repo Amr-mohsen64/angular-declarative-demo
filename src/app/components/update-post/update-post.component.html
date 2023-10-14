@@ -1,0 +1,25 @@
+<div *ngIf=" post$ | async">
+  <h3>Update Post</h3>
+  <div>
+    <form [formGroup]="postForm" (ngSubmit)="onUpdatePost()">
+      <div class="my-2">
+        <label for="">title</label>
+        <input type="text" class="form-control" formControlName="title" />
+      </div>
+      <div class="my-2">
+        <label for="">description</label>
+        <textarea class="form-control" formControlName="description"></textarea>
+      </div>
+      <div class="my-2">
+        <label for="">Category</label>
+        <select class="form-control" formControlName="categoryId">
+          <option value="">select category</option>
+          <option [value]="category.id" *ngFor="let category of categories$ | async">{{category.title}}</option>
+        </select>
+      </div>
+      <div class="my-2">
+        <button type="submit" class="btn btn-primary">Update</button>
+      </div>
+    </form>
+  </div>
+</div>

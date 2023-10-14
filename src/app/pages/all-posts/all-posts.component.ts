@@ -35,6 +35,7 @@ export class AllPostsComponent implements OnInit {
   }
 
   onSelectPost(post: IPost) {
+    this.showAddPost = false;
     post.id && this.postsService.selectPost(post.id);
   }
 
