@@ -183,7 +183,7 @@ export class DeclarativePostsService {
 
   updatePostToServer(post: IPost) {
     return this.http.patch<IPost>(
-      `https://declarative-angular-1d8a5-default-rtdb.firebaseio.comdd/posts/${post.id}.json`,
+      `https://declarative-angular-1d8a5-default-rtdb.firebaseio.com/posts/${post.id}.json`,
       post
     );
   }
