@@ -12,6 +12,9 @@
           </option>
         </select>
       </div>
+      <div class="col-md-8">
+        <a routerLink="/declarative-posts/add" class="btn btn-primary">Add Post</a>
+      </div>
     </div>
 
     <table class="table" *ngIf="filteredPosts$ | async as posts">
@@ -21,6 +24,7 @@
           <th>Title</th>
           <th>Description</th>
           <th>Category</th>
+          <th>Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -29,6 +33,9 @@
           <td>{{post.title}}</td>
           <td>{{post.description}}</td>
           <td>{{post.categoryName}}</td>
+          <td>
+            <a [routerLink]="['/declarative-posts/edit',post.id]" class="btn btn-warning">Update Post</a>
+          </td>
         </tr>
       </tbody>
     </table>

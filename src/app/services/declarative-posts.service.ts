@@ -1,7 +1,9 @@
+import { NotificationService } from './notification.service';
 import { CRUDAction } from './../models/IPost.model';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import {
+  BehaviorSubject,
   Observable,
   Subject,
   catchError,
@@ -14,6 +16,7 @@ import {
   scan,
   share,
   shareReplay,
+  tap,
   throwError,
 } from 'rxjs';
 import { IPost } from '../models/IPost.model';
@@ -27,7 +30,8 @@ const APIURL =
 export class DeclarativePostsService {
   constructor(
     private http: HttpClient,
-    private categoriesService: CategoriesDeclarativeService
+    private categoriesService: CategoriesDeclarativeService,
+    private notificationService: NotificationService
   ) {}
 
   posts$ = this.http.get<{ [id: string]: IPost }>(APIURL).pipe(
@@ -57,16 +61,16 @@ export class DeclarativePostsService {
         };
       });
     }),
-    catchError(this.handleError),
-    shareReplay(1)
+    shareReplay(1),
+    catchError(this.handleError)
   );
 
-  private postCRUDSubject = new Subject<CRUDAction<IPost>>();
-  postCRUDAction$ = this.postCRUDSubject.asObservable();
+  private postCRUDCompleteSubject = new Subject<CRUDAction<IPost>>();
+  postCRUDCompleteAction$ = this.postCRUDCompleteSubject.asObservable();
 
   allPosts$ = merge(
     this.postsWithCategory$,
-    this.postCRUDAction$.pipe(
+    this.postCRUDCompleteAction$.pipe(
       concatMap((postAction) =>
         this.savePost(postAction).pipe(
           map((post) => ({ ...postAction, data: post }))
@@ -75,19 +79,20 @@ export class DeclarativePostsService {
     )
   ).pipe(
     scan((posts, value) => this.modifyPosts(posts, value), [] as IPost[]),
-    shareReplay(1)
+    shareReplay(1),
+    catchError(this.handleError)
   );
 
   addPost(post: IPost) {
-    this.postCRUDSubject.next({ action: 'add', data: post });
+    this.postCRUDCompleteSubject.next({ action: 'add', data: post });
   }
 
   updatePost(post: IPost) {
-    this.postCRUDSubject.next({ action: 'update', data: post });
+    this.postCRUDCompleteSubject.next({ action: 'update', data: post });
   }
 
   deletePost(post: IPost) {
-    this.postCRUDSubject.next({ action: 'delete', data: post });
+    this.postCRUDCompleteSubject.next({ action: 'delete', data: post });
   }
 
   modifyPosts(posts: IPost[], value: IPost[] | CRUDAction<IPost>) {
@@ -110,20 +115,45 @@ export class DeclarativePostsService {
     return posts;
   }
 
+  private postCRUDCompletedSubject = new Subject<boolean>();
+  postCRUDCompletedAction$ = this.postCRUDCompletedSubject.asObservable();
+
   savePost(postAction: CRUDAction<IPost>): Observable<IPost> {
+    this.postCRUDCompletedSubject.next(false); //reset it
     let postDetails$!: Observable<IPost>;
 
     if (postAction.action === 'add') {
-      postDetails$ = this.addPostToServer(postAction.data);
+      postDetails$ = this.addPostToServer(postAction.data).pipe(
+        tap(() => {
+          this.notificationService.setSuccessMessage('post added successfully');
+          this.postCRUDCompletedSubject.next(true);
+        }),
+        catchError(this.handleError)
+      );
     }
 
     if (postAction.action === 'update') {
-      postDetails$ = this.updatePostToServer(postAction.data);
+      postDetails$ = this.updatePostToServer(postAction.data).pipe(
+        tap(() => {
+          this.notificationService.setSuccessMessage(
+            'post updated successfully'
+          );
+          this.postCRUDCompletedSubject.next(true);
+        }),
+        catchError(this.handleError)
+      );
     }
 
     if (postAction.action === 'delete') {
       return this.deletePostToServer(postAction.data).pipe(
-        map(() => postAction.data)
+        map(() => postAction.data),
+        tap(() => {
+          this.notificationService.setSuccessMessage(
+            'post delete successfully'
+          );
+          this.postCRUDCompletedSubject.next(true);
+        }),
+        catchError(this.handleError)
       );
     }
 
@@ -153,7 +183,7 @@ export class DeclarativePostsService {
 
   updatePostToServer(post: IPost) {
     return this.http.patch<IPost>(
-      `https://declarative-angular-1d8a5-default-rtdb.firebaseio.com/posts/${post.id}.json`,
+      `https://declarative-angular-1d8a5-default-rtdb.firebaseio.comdd/posts/${post.id}.json`,
       post
     );
   }

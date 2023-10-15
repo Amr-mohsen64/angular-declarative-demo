@@ -19,7 +19,7 @@ export class PostsDeclarativeComponent implements OnInit {
   private selectedCategorySubject = new BehaviorSubject<string>('');
   selectedCategoryAction$ = this.selectedCategorySubject.asObservable();
   categories$ = this.categoriesDeclarativeService.categories$;
-  posts$ = this.declarativePostsService.postsWithCategory$;
+  posts$ = this.declarativePostsService.allPosts$;
 
   filteredPosts$ = combineLatest([
     this.posts$,
